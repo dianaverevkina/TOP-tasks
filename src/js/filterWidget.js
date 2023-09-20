@@ -2,10 +2,11 @@ import tasks from './allTasks';
 import Task from './Task';
 
 export default class FilterWidget {
-  constructor(container, showList, filterTasks) {
+  constructor(container, savedTasks, showList, filterTasks) {
     if (typeof container === 'string') {
       this.container = document.querySelector(container);
     }
+    this.savedTasks = savedTasks;
     this.showList = showList;
     this.filterTasks = filterTasks;
     this.filterForm = this.container.querySelector('.filter-widget__form');
@@ -18,15 +19,20 @@ export default class FilterWidget {
     this.addEvents();
   }
 
+  // Добавляем события
   addEvents() {
     this.filterForm.addEventListener('submit', this.addToTasksList);
     this.filterText.addEventListener('keydown', this.stopShowingError);
     this.filterText.addEventListener('input', this.filter);
   }
 
+  // Добавляем задачу в список задач, если поле ввода не пусто и нажато enter
+  // Отрисовываем список задач и очищаем поле ввода
+  // Если поле ввода пустое, то просим написать задачу
   addToTasksList(e) {
     e.preventDefault();
     const cleanInput = this.filterText.value.trim().toLowerCase();
+
     if (!cleanInput) {
       this.showError();
       this.filterText.classList.add('filter-widget__text_red');
@@ -38,6 +44,7 @@ export default class FilterWidget {
     this.filterForm.reset();
   }
 
+  // Отображаем ошибку, если поле ввода пустое
   showError() {
     this.errorText = document.createElement('p');
     this.errorText.classList.add('filter-widget__error');
@@ -46,17 +53,23 @@ export default class FilterWidget {
     this.container.append(this.errorText);
   }
 
+  // Добавляем задачу в список задач в памяти
+  // Сохраняем задачи в локальное хранилище
   addTask() {
     const task = this.createTask();
     tasks.push(task);
+
+    this.savedTasks.saveTasks(tasks);
   }
 
+  // Создаем задачу с помощью объекта класса Task
   createTask() {
     const input = this.filterText.value;
     const id = Math.floor(Math.random() * 1000000);
     return new Task(id, input, false);
   }
 
+  // Если пользователь продолжает ввод в инпуте, то перестаем отображать ошибку
   stopShowingError(e) {
     if (e.code === 'Space') return;
 
@@ -66,6 +79,7 @@ export default class FilterWidget {
     }
   }
 
+  // Фильтруем задачи по введеному тексту в поле ввода, обновляем список через 0.3 сек
   filter(e) {
     e.preventDefault();
 

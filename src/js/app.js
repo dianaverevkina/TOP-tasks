@@ -1,6 +1,10 @@
 import FilterWidget from './filterWidget';
 import TasksList from './TasksList';
+import SavedTasks from './savedTasks';
 
-const tasksList = new TasksList('.tasks');
-const filter = new FilterWidget('.filter-widget', tasksList.renderTasks, tasksList.filterItems);
+const savedTasks = new SavedTasks(localStorage);
+
+const tasksList = new TasksList('.tasks', savedTasks);
+tasksList.checkStorage();
+const filter = new FilterWidget('.filter-widget', savedTasks, tasksList.renderTasks, tasksList.filterItemsByName);
 console.log(filter);
